@@ -6,7 +6,7 @@ const POSSIBLE_OPS: &[&str] = &["CR","OP","WR","RD","CL"];
 
 // Struttura wrapper per la fila di operazioni da eseguire
 #[derive(Clone, Debug)]
-pub struct OpFlow (Vec<String>);
+pub struct OpFlow (pub Vec<String>);
 
 // Implementazione di Arbitrary per generare una lista random di operazioni
 impl Arbitrary for OpFlow {

@@ -1,3 +1,4 @@
+use quickcheck::quickcheck;
 
 use automata_structs::Edge as Edge;
 use automata_structs::State as State;
@@ -155,26 +156,57 @@ fn get_open_first_automata () -> Vec<State> {
     vec![start_state,second_state,third_state,end_state,fail_state]
 }
 
+
 // Funzione per testare la proprietà rappresentata dall'automa su un flusso di operazioni
 fn open_first(ops:OpFlow) -> bool {
 
     // Creo automa
-    let op_first_auto = get_open_first_automata;
+    let op_first_auto : Vec<State> = get_open_first_automata();
+    
     // Prelevo stato start
-    let mut current_state = op_first_auto[0];
+    let mut current_state = &op_first_auto[0];
+    // Destruct OpFlow
+    let OpFlow(mut op_seq) = ops;
+    // Prelevo prima operazione richiesta    
+    let mut curr_op = op_seq.pop();
 
     // Finchè non giungo ad uno stato finale
-    while current_state::outgoing_edges.is_some() {
-        // Prelevo operazione richiesta
-        let mut curr_op = ops.pop();
-        // TO-DO
+    while current_state.outgoing_edges.is_some() {
+
+        // Controllo quale arco seguire
+        for ed in current_state.outgoing_edges.as_ref().expect("REASON").iter() {
+
+            // TO-DO: più di un arco true
+            // Se la condizione di un arco è rispettata
+            if (ed.condition)(curr_op.as_ref().expect("REASON").to_string()) {
+                let mut next_state = current_state;
+                let mut state_index = op_first_auto.iter();
+
+                // Cerco prossimo stato nell'automa
+                while next_state.name.ne(&ed.where_to) {
+                    next_state = state_index.next().expect("REASON");
+                }
+
+                // Stato trovato
+                if next_state.name.eq(&ed.where_to) {
+                    current_state = next_state;
+                    println!("{}",ed.where_to); // TEST
+                }
+                // Stato non presente
+                else {return false};
+            }
+        }
+        //Estraggo prossima operazione
+        curr_op = op_seq.pop();
     }
 
     // Se finisco in uno stato di fallimento
     // -> proprietà non rispettata
-    if current_state::name.eq("Fail") false
+    if current_state.name.eq("Fail") {
+        return false;
+    }
     // Altrimenti
-    true
+    return true;
     
 }
 
