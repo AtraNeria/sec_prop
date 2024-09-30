@@ -104,12 +104,18 @@ fn test_flow (ops: OpFlow, automa: Vec<State>) -> bool {
 
         println!("{:?}",curr_op);  //TEST
 
+        let mut edge_found = false;
         // Controllo quale arco seguire
         for ed in current_state.outgoing_edges.as_ref().expect("REASON").iter() {
 
-            // TO-DO: più di un arco true
             // Se la condizione di un arco è rispettata
             if (ed.condition)(curr_op.as_ref().expect("REASON").to_string()) {
+                
+                // Se era già stato trovato un arco true
+                // -> automa non deterministico
+                if edge_found {return false;}
+                else {edge_found = true;}
+
                 let mut next_state = current_state;
                 let mut state_index = automa.iter();
 
