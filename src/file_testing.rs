@@ -149,7 +149,7 @@ fn test_flow (ops: OpFlow, automa: Vec<State>) -> bool {
 
 
 // Costruttore per automa che rappresenta la prima politica
-// Prima di poter eseguire unìoperazione su un file questo deve essere aperto
+// Prima di poter eseguire un'operazione su un file questo deve essere aperto
 fn get_open_first_automata () -> Vec<State> {
 
     //First State: start
