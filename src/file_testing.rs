@@ -91,7 +91,7 @@ fn start() {
 
 
 // Testo il flusso di operazioni ops sull'automa
-fn test_flow (ops: OpFlow, automa: Vec<State>) -> bool {
+fn test_flow (ops: OpFlow, automa: Vec<State>) -> u8 {
     // Prelevo stato start
     let mut current_state = &automa[0];
     // Destruct OpFlow
@@ -102,8 +102,6 @@ fn test_flow (ops: OpFlow, automa: Vec<State>) -> bool {
     // Finchè non giungo ad uno stato finale
     while current_state.outgoing_edges.is_some() {
 
-        println!("{:?}",curr_op);  //TEST
-
         let mut edge_found = false;
         // Controllo quale arco seguire
         for ed in current_state.outgoing_edges.as_ref().expect("REASON").iter() {
@@ -113,7 +111,7 @@ fn test_flow (ops: OpFlow, automa: Vec<State>) -> bool {
                 
                 // Se era già stato trovato un arco true
                 // -> automa non deterministico
-                if edge_found {return false;}
+                if edge_found {return 1;}
                 else {edge_found = true;}
 
                 let mut next_state = current_state;
@@ -127,10 +125,9 @@ fn test_flow (ops: OpFlow, automa: Vec<State>) -> bool {
                 // Stato trovato
                 if next_state.name.eq(&ed.where_to) {
                     current_state = next_state;
-                    println!("{}",ed.where_to); // TEST
                 }
                 // Stato non presente
-                else {return false};
+                else {return 2};
             }
         }
         //Estraggo prossima operazione
@@ -140,10 +137,10 @@ fn test_flow (ops: OpFlow, automa: Vec<State>) -> bool {
     // Se finisco in uno stato di fallimento
     // -> proprietà non rispettata
     if current_state.name.eq("Fail") {
-        return false;
+        return 3;
     }
     // Altrimenti
-    return true;
+    return 0;
 }
 
 
@@ -429,17 +426,45 @@ fn get_single_write_automata () -> Vec<State> {
 pub fn open_first(ops:OpFlow) -> bool {
     // Creo automa e testo ops
     let op_first_auto : Vec<State> = get_open_first_automata();
-    return test_flow(ops, op_first_auto);
+    let res = test_flow(ops, op_first_auto);
+    let mut ret_value = false;
+    match res {
+        0 => {println!("End State");
+            ret_value = true; },
+        1 => println!("Più di un edge true: automa non deterministico"),
+        2 => println!("Stato non presente"),
+        3 => println!("Fail State"),
+        _ => println!("Error"),
+    }
+    return ret_value;
 }
 
 // Test seconda proprietà
 pub fn read_only(ops:OpFlow) -> bool {
     let read_only_auto = get_read_only_automata();
-    return test_flow(ops, read_only_auto)
-}
+    let res = test_flow(ops, read_only_auto);
+    let mut ret_value = false;
+    match res {
+        0 => {println!("End State");
+            ret_value = true; },
+        1 => println!("Più di un edge true: automa non deterministico"),
+        2 => println!("Stato non presente"),
+        3 => println!("Fail State"),
+        _ => println!("Error"),
+    }
+    return ret_value;}
 
 // Test terza proprietà
 pub fn single_write(ops:OpFlow) -> bool {
     let single_write_auto = get_single_write_automata();
-    return test_flow(ops, single_write_auto);
-}
+    let res = test_flow(ops, single_write_auto);
+    let mut ret_value = false;
+    match res {
+        0 => {println!("End State");
+            ret_value = true; },
+        1 => println!("Più di un edge true: automa non deterministico"),
+        2 => println!("Stato non presente"),
+        3 => println!("Fail State"),
+        _ => println!("Error"),
+    }
+    return ret_value;}
