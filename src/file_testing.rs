@@ -83,11 +83,11 @@ fn op_is_not_opencreate(op: String)-> bool {
     }
 }
 
-//TEST for the starting state
+/* TEST
 fn start() {
     println!("Start point of the automata");
 }
-
+*/
 
 
 // Testo il flusso di operazioni ops sull'automa
@@ -167,7 +167,7 @@ fn get_open_first_automata () -> Vec<State> {
 
     let start_state = State {
         name: "Start".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: true,
         is_terminal: false,
         is_failure: false,
@@ -188,7 +188,7 @@ fn get_open_first_automata () -> Vec<State> {
 
     let second_state = State {
         name: "file_created".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: false,
         is_terminal: false,
         is_failure: false,
@@ -209,7 +209,7 @@ fn get_open_first_automata () -> Vec<State> {
 
     let third_state = State {
         name: "file_opened".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: false,
         is_terminal: false,
         is_failure: false,
@@ -219,7 +219,7 @@ fn get_open_first_automata () -> Vec<State> {
     //End State: operation permitted
     let end_state = State {
         name: "End".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: false,
         is_terminal: true,
         is_failure: false,
@@ -229,7 +229,7 @@ fn get_open_first_automata () -> Vec<State> {
     //Fail State
     let fail_state = State {
         name: "Fail".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: false,
         // Both true: facile da modificare per inserire un flusso in cui si risponde al fallimento
         is_terminal: true,
@@ -257,7 +257,7 @@ fn get_read_only_automata () -> Vec<State> {
 
     let start_state = State {
         name: "Start".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: true,
         is_terminal: false,
         is_failure: false,
@@ -278,7 +278,7 @@ fn get_read_only_automata () -> Vec<State> {
 
     let second_state = State {
         name: "file_opened".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: false,
         is_terminal: false,
         is_failure: false,
@@ -288,7 +288,7 @@ fn get_read_only_automata () -> Vec<State> {
     //End State: operation permitted
     let end_state = State {
         name: "End".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: false,
         is_terminal: true,
         is_failure: false,
@@ -298,7 +298,7 @@ fn get_read_only_automata () -> Vec<State> {
     //Fail State
     let fail_state = State {
         name: "Fail".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: false,
         // Both true: facile da modificare per inserire un flusso in cui si risponde al fallimento
         is_terminal: true,
@@ -329,7 +329,7 @@ fn get_single_write_automata () -> Vec<State> {
     };
     let start_state = State {
         name: "Start".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: true,
         is_terminal: false,
         is_failure: false,
@@ -352,7 +352,7 @@ fn get_single_write_automata () -> Vec<State> {
     };
     let second_state = State {
         name: "file_created".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: false,
         is_terminal: false,
         is_failure: false,
@@ -371,7 +371,7 @@ fn get_single_write_automata () -> Vec<State> {
     };
     let third_state = State {
         name: "file_opened".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: false,
         is_terminal: false,
         is_failure: false,
@@ -390,7 +390,7 @@ fn get_single_write_automata () -> Vec<State> {
     };
     let fourth_state = State {
         name: "file_written".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: false,
         is_terminal: false,
         is_failure: false,
@@ -400,7 +400,7 @@ fn get_single_write_automata () -> Vec<State> {
     //End State: operation permitted
     let end_state = State {
         name: "End".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: false,
         is_terminal: true,
         is_failure: false,
@@ -410,7 +410,7 @@ fn get_single_write_automata () -> Vec<State> {
     //Fail State
     let fail_state = State {
         name: "Fail".to_string(),
-        action: start, //TO_DO
+        action: None,
         is_starting: false,
         // Both true: facile da modificare per inserire un flusso in cui si risponde al fallimento
         is_terminal: true,
@@ -452,7 +452,8 @@ pub fn read_only(ops:OpFlow) -> bool {
         3 => println!("Fail State"),
         _ => println!("Error"),
     }
-    return ret_value;}
+    return ret_value;
+}
 
 // Test terza proprietà
 pub fn single_write(ops:OpFlow) -> bool {
@@ -467,4 +468,5 @@ pub fn single_write(ops:OpFlow) -> bool {
         3 => println!("Fail State"),
         _ => println!("Error"),
     }
-    return ret_value;}
+    return ret_value;
+}

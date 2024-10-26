@@ -15,7 +15,7 @@ pub struct State {
     // Name of the state to be used by edges
     pub name: String,
     // Action to be performed in the state
-    pub action: fn(),
+    pub action: Option<fn()>,
 
     // Flags for what kind of state it is
     pub is_starting: bool,
