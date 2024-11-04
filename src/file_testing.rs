@@ -83,11 +83,7 @@ fn op_is_not_opencreate(op: String)-> bool {
     }
 }
 
-/* TEST
-fn start() {
-    println!("Start point of the automata");
-}
-*/
+
 
 
 // Testo il flusso di operazioni ops sull'automa
@@ -143,7 +139,19 @@ fn test_flow (ops: OpFlow, automa: Vec<State>) -> u8 {
     return 0;
 }
 
-
+// Print warning in base all'output di test_flow
+fn print_result (res_code: u8) -> bool {
+    match res_code {
+        0 => {println!("End State");
+            return true; 
+        },
+        1 => println!("Più di un edge true: automa non deterministico"),
+        2 => println!("Stato non presente"),
+        3 => println!("Fail State"),
+        _ => println!("Error"),
+    }
+    return false;
+}
 
 // Costruttore per automa che rappresenta la prima politica
 // Prima di poter eseguire un'operazione su un file questo deve essere aperto
@@ -426,47 +434,17 @@ fn get_single_write_automata () -> Vec<State> {
 pub fn open_first(ops:OpFlow) -> bool {
     // Creo automa e testo ops
     let op_first_auto : Vec<State> = get_open_first_automata();
-    let res = test_flow(ops, op_first_auto);
-    let mut ret_value = false;
-    match res {
-        0 => {println!("End State");
-            ret_value = true; },
-        1 => println!("Più di un edge true: automa non deterministico"),
-        2 => println!("Stato non presente"),
-        3 => println!("Fail State"),
-        _ => println!("Error"),
-    }
-    return ret_value;
+    return print_result(test_flow(ops, op_first_auto));
 }
 
 // Test seconda proprietà
 pub fn read_only(ops:OpFlow) -> bool {
     let read_only_auto = get_read_only_automata();
-    let res = test_flow(ops, read_only_auto);
-    let mut ret_value = false;
-    match res {
-        0 => {println!("End State");
-            ret_value = true; },
-        1 => println!("Più di un edge true: automa non deterministico"),
-        2 => println!("Stato non presente"),
-        3 => println!("Fail State"),
-        _ => println!("Error"),
-    }
-    return ret_value;
+    return print_result(test_flow(ops, read_only_auto));
 }
 
 // Test terza proprietà
 pub fn single_write(ops:OpFlow) -> bool {
     let single_write_auto = get_single_write_automata();
-    let res = test_flow(ops, single_write_auto);
-    let mut ret_value = false;
-    match res {
-        0 => {println!("End State");
-            ret_value = true; },
-        1 => println!("Più di un edge true: automa non deterministico"),
-        2 => println!("Stato non presente"),
-        3 => println!("Fail State"),
-        _ => println!("Error"),
-    }
-    return ret_value;
+    return print_result(test_flow(ops, single_write_auto));
 }

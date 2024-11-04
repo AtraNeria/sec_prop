@@ -3,6 +3,8 @@ mod automata_structs;
 
 use file_testing::{open_first, read_only, single_write};
 mod file_testing;
+use API_testing::{root_check_test, no_writing_test, single_call_test};
+mod API_testing;
 
 use operations_structs::OpFlow as OpFlow;
 mod operations_structs;
@@ -29,4 +31,11 @@ fn test_second () {
 #[test]
 fn test_third () {
     quickcheck(single_write as fn(OpFlow) -> bool);
+}
+
+// Controlla prima politica su API
+// Controllo credenziali
+#[test]
+fn test_api_first () {
+    quickcheck(root_check_test as fn() -> bool);
 }

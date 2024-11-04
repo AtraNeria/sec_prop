@@ -8,3 +8,5 @@ edition = "2021"
 [dependencies]
 quickcheck = "1"
 quickcheck_macros = "1"
+is-root = "0.1.2"
+nix = {version = "0.28", features = ["user"]}
