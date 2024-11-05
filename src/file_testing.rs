@@ -3,6 +3,25 @@ use crate::automata_structs::State as State;
 
 use crate::operations_structs::OpFlow as OpFlow;
 
+// Struttura che contiene il risultato di un'istanza di test
+struct TestResult {
+    // Codice del risultato
+    result_code: u8,
+    // Numero di stati esplorati
+    explored_states: u8,
+    // Possibile prossimo stato
+    // usato se lo stato non viene trovato
+    next_state_unfound: Option<String>,
+    // Edge resi true dall'ultima operazione
+    // se più edge sono stati resi true
+    true_edges: Option<Vec<EdgeId>>,
+}
+
+struct EdgeId {
+    from_state: String,
+    to_state: String,
+}
+
 // Checks if the operation is "Read"
 fn op_is_read(op: String)-> bool {
     if op.eq("RD") {
@@ -87,13 +106,21 @@ fn op_is_not_opencreate(op: String)-> bool {
 
 
 // Testo il flusso di operazioni ops sull'automa
-fn test_flow (ops: OpFlow, automa: Vec<State>) -> u8 {
+fn test_flow (ops: OpFlow, automa: Vec<State>) -> TestResult {
     // Prelevo stato start
     let mut current_state = &automa[0];
     // Destruct OpFlow
     let OpFlow(mut op_seq) = ops;
     // Prelevo prima operazione richiesta    
     let mut curr_op = op_seq.pop();
+
+    // Inizializzo risultato del test
+    let mut res = TestResult {
+        result_code: 0,
+        explored_states: 0,
+        next_state_unfound: None,
+        true_edges: None,
+    };
 
     // Finchè non giungo ad uno stato finale
     while current_state.outgoing_edges.is_some() {
@@ -102,13 +129,29 @@ fn test_flow (ops: OpFlow, automa: Vec<State>) -> u8 {
         // Controllo quale arco seguire
         for ed in current_state.outgoing_edges.as_ref().expect("REASON").iter() {
 
+            res.explored_states = res.explored_states + 1;
             // Se la condizione di un arco è rispettata
             if (ed.condition)(curr_op.as_ref().expect("REASON").to_string()) {
                 
                 // Se era già stato trovato un arco true
                 // -> automa non deterministico
-                if edge_found {return 1;}
-                else {edge_found = true;}
+                if edge_found {
+                    res.result_code = 1;
+                    let curr_edge_id = EdgeId {
+                        from_state : current_state.name.clone(),
+                        to_state : ed.where_to.clone(),
+                    };
+                    res.true_edges.as_mut().expect("REASON").push(curr_edge_id);
+                    return res;
+                }
+                else {
+                    edge_found = true;
+                    let curr_edge_id = EdgeId {
+                        from_state : current_state.name.clone(),
+                        to_state : ed.where_to.clone(),
+                    };
+                    res.true_edges = Some(vec![curr_edge_id]);
+                }
 
                 let mut next_state = current_state;
                 let mut state_index = automa.iter();
@@ -123,7 +166,11 @@ fn test_flow (ops: OpFlow, automa: Vec<State>) -> u8 {
                     current_state = next_state;
                 }
                 // Stato non presente
-                else {return 2};
+                else {
+                    res.result_code = 2;
+                    res.next_state_unfound = Some(ed.where_to.clone());
+                    return res;
+                }
             }
         }
         //Estraggo prossima operazione
@@ -133,21 +180,53 @@ fn test_flow (ops: OpFlow, automa: Vec<State>) -> u8 {
     // Se finisco in uno stato di fallimento
     // -> proprietà non rispettata
     if current_state.name.eq("Fail") {
-        return 3;
+        res.result_code = 3;
     }
     // Altrimenti
-    return 0;
+    return res;
 }
 
 // Print warning in base all'output di test_flow
-fn print_result (res_code: u8) -> bool {
-    match res_code {
-        0 => {println!("End State");
+fn print_result (result: TestResult, ops: OpFlow) -> bool {
+    match result.result_code {
+        // Stato finale
+        0 => {
+            println!("End State");
             return true; 
         },
-        1 => println!("Più di un edge true: automa non deterministico"),
-        2 => println!("Stato non presente"),
-        3 => println!("Fail State"),
+        // Automa non deterministico
+        1 => {
+            println!("Automa non deterministico: rilevati più archi possibili da seguire");
+            match result.true_edges {
+                Some(edges) => for edge_id in edges {
+                    println!("Arco da {} a {}",edge_id.from_state,edge_id.to_state);
+                },
+                None => println!("Errore"),
+            }
+        },
+        // Stato non trovato
+        2 => {
+            let nsu = result.next_state_unfound;
+            match nsu {
+                Some(nsu) => println!{"Stato non presente \nLo stato {} non è stato trovato",nsu},
+                None => println!("Stato non presente"),
+            };
+        },
+        // Stato di fallimento
+        3 => {
+            println!("Raggiunto stato di fallimento.\nLa sequenza di operazioni che ha fallito è:");
+            let OpFlow(ref op_seq) = ops;
+            for i in (op_seq.len()-result.explored_states as usize..op_seq.len()).rev() {
+                match op_seq[i as usize].as_str() {
+                    "RD" => println!("Read"),
+                    "WR" => println!("Write"),
+                    "CR" => println!("Create"),
+                    "CL" => println!("Close"),
+                    "OP" => println!("Open"),
+                    _ => println!("Errore: operazione non prevista"),
+                }
+            }
+        },
         _ => println!("Error"),
     }
     return false;
@@ -434,17 +513,17 @@ fn get_single_write_automata () -> Vec<State> {
 pub fn open_first(ops:OpFlow) -> bool {
     // Creo automa e testo ops
     let op_first_auto : Vec<State> = get_open_first_automata();
-    return print_result(test_flow(ops, op_first_auto));
+    return print_result(test_flow(ops.clone(), op_first_auto),ops);
 }
 
 // Test seconda proprietà
 pub fn read_only(ops:OpFlow) -> bool {
     let read_only_auto = get_read_only_automata();
-    return print_result(test_flow(ops, read_only_auto));
+    return print_result(test_flow(ops.clone(), read_only_auto),ops);
 }
 
 // Test terza proprietà
 pub fn single_write(ops:OpFlow) -> bool {
     let single_write_auto = get_single_write_automata();
-    return print_result(test_flow(ops, single_write_auto));
+    return print_result(test_flow(ops.clone(), single_write_auto),ops);
 }

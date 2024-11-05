@@ -1,6 +1,6 @@
 use crate::automata_structs::Edge as Edge;
 use crate::automata_structs::State as State;
-use nix::unistd;
+//use nix::unistd;  //TEST
 use is_root::is_root;
 
 
@@ -256,32 +256,10 @@ pub fn root_check_test () -> bool {
 
 pub fn no_writing_test () -> bool {
     let nw_automata = get_no_writing_automata();
-    let res = test_api_automata(nw_automata);
-    let mut ret_value = false;
-    match res {
-        0 => {println!("End State");
-            ret_value = true; },
-        1 => println!("Più di un edge true: automa non deterministico"),
-        2 => println!("Stato non presente"),
-        3 => println!("Fail State"),
-        4 => println!("State Action not found"),
-        _ => println!("Error"),
-    }
-    return ret_value;
+    return print_result(test_api_automata(nw_automata));
 }
 
 pub fn single_call_test () -> bool {
     let sc_automata = get_single_call_automata();
-    let res = test_api_automata(sc_automata);
-    let mut ret_value = false;
-    match res {
-        0 => {println!("End State");
-            ret_value = true; },
-        1 => println!("Più di un edge true: automa non deterministico"),
-        2 => println!("Stato non presente"),
-        3 => println!("Fail State"),
-        4 => println!("State Action not found"),
-        _ => println!("Error"),
-    }
-    return ret_value;
+    return print_result(test_api_automata(sc_automata));
 }
