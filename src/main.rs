@@ -3,12 +3,13 @@ mod automata_structs;
 
 use file_testing::{open_first, read_only, single_write};
 mod file_testing;
-use API_testing::{root_check_test, no_writing_test, single_call_test};
+use API_testing::{conflict_test, isolation_test};
 mod API_testing;
 
 use operations_structs::OpFlow as OpFlow;
 mod operations_structs;
-
+use code_provider_structs::{CodeProvider,ApiFunCall};
+mod code_provider_structs;
 
 // Controllo prima politica
 // Prima di poter eseguire un'operazione su un file questo deve essere aperto
@@ -34,8 +35,15 @@ fn test_third () {
 }
 
 // Controlla prima politica su API
-// Controllo credenziali
+// Estraggo provider di codice e funzione chiamata, e controllo i conflitti
 #[test]
 fn test_api_first () {
-    quickcheck(root_check_test as fn() -> bool);
+    quickcheck(conflict_test as fn(CodeProvider, ApiFunCall) -> bool);
+}
+
+// Controlla seconda politica su API
+// Controllo che si chiamino solo funzioni dello stesso provider
+#[test]
+fn test_api_second () {
+    quickcheck(isolation_test as fn(CodeProvider, ApiFunCall) -> bool);
 }

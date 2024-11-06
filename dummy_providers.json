@@ -1,0 +1,2 @@
+[{"name":"provider_1","api_name":"api_1","offered_fn":["fn_1_1","fn_1_2","fn_1_3"],"conflicts":null},{"name":"provider_2","api_name":"api_2","offered_fn":["fn_2_1","fn_2_2","fn_2_3","fn_2_4"],"conflicts":["api_1"]},{"name":"provider_3","api_name":"api_3","offered_fn":["fn_3_1","fn_3_2","fn_3_3","fn_3_4"],"conflicts":["api_2"]},{"name":"provider_4","api_name":"api_4","offered_fn":["fn_4_1","fn_4_2"],"conflicts":["api_1","api_2","api_3"]}]
+
