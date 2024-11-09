@@ -1,9 +1,6 @@
-use crate::automata_structs::Edge as Edge;
-use crate::automata_structs::State as State;
-use crate::code_provider_structs::CodeProvider as CodeProvider;
-use crate::code_provider_structs::ApiFunCall as ApiFunCall;
+use crate::automata_structs::{Edge, State};
+use crate::code_provider_structs::{CodeProvider, ApiFunCall, FunGroup, MaxConnections};
 use crate::code_provider_structs::get_providers;
-
 
 
 fn is_true(res: String)-> bool {
@@ -71,7 +68,7 @@ fn test_api_automata (automa: Vec<State>, chosen_provider: CodeProvider, called:
     if current_state.name.eq("Fail") {
         return 3;
     }
-    // Altrimenti*/
+    // Altrimenti
     return 0;
 }
 
@@ -90,15 +87,24 @@ fn print_result (res_code: u8) -> bool {
     return false;
 }
 
+// Controlla se provider offre la funzione func
+fn offers_fun (provider: CodeProvider, func: ApiFunCall) -> bool {
+    for offered in provider.offered_fn.iter() {
+        if offered.name.eq(&func.name) {
+            return true;
+        }
+    }
+    return false;
+}
+
 // Controlla se è presente conflitto tra il provider scelto e la chiamata di funzione
 fn is_in_conflict (chosen_provider: CodeProvider, called: ApiFunCall) -> String {
     match chosen_provider.conflicts {
         Some(conf) =>{
             let providers_list = get_providers();
-            let ApiFunCall(called_api_fun) = called;
             let mut result = "false".to_string();
             for prov in providers_list.iter() {
-                if prov.offered_fn.contains(&called_api_fun) && conf.contains(&prov.api_name) {
+                if offers_fun(prov.clone(), called.clone()) && conf.contains(&prov.api_name) {
                     result = "true".to_string();}
             }
             return result;
@@ -152,8 +158,7 @@ fn get_conflict_check_automata () -> Vec<State> {
 
 // Controlla se la chiamata mantiene il provider isolato
 fn isolation_check (chosen_provider: CodeProvider, called: ApiFunCall) -> String {
-    let ApiFunCall(called_api_fun) = called;
-    if chosen_provider.offered_fn.contains(&called_api_fun) {
+    if offers_fun(chosen_provider, called) {
         return "true".to_string();
     }
     else {return "false".to_string();}
@@ -202,6 +207,22 @@ fn get_provider_isolation_automata () -> Vec<State> {
     vec![start_state, end_state, fail_state]
 }
 
+// Funzione per testare automa di numero connessioni
+fn test_connections (max_con: MaxConnections, called: FunGroup, curr_con: u8) -> u8 {
+    let FunGroup(mut api_calls) = called;
+    let MaxConnections(mc) = max_con;
+    let next_call = api_calls.pop();
+    
+    match next_call {
+        Some(call) => {
+            let new_con = curr_con + call.connections_required;
+            if new_con > mc {return 3;}
+            else {return test_connections(max_con, FunGroup(api_calls), new_con);}
+        },
+        None => return 0,
+    }
+}
+
 pub fn conflict_test (provider: CodeProvider, api_call: ApiFunCall) -> bool {
     let conflicts_aut = get_conflict_check_automata();    
     return print_result(test_api_automata(conflicts_aut, provider, api_call));
@@ -210,4 +231,8 @@ pub fn conflict_test (provider: CodeProvider, api_call: ApiFunCall) -> bool {
 pub fn isolation_test (provider: CodeProvider, api_call: ApiFunCall) -> bool {
     let iso_aut = get_provider_isolation_automata();
     return print_result(test_api_automata(iso_aut, provider, api_call));
+}
+
+pub fn connections_test (con_max: MaxConnections, api_calls: FunGroup) -> bool {
+    return print_result(test_connections(con_max, api_calls, 0));
 }

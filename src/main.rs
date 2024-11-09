@@ -3,12 +3,12 @@ mod automata_structs;
 
 use file_testing::{open_first, read_only, single_write};
 mod file_testing;
-use API_testing::{conflict_test, isolation_test};
+use API_testing::{conflict_test, isolation_test, connections_test};
 mod API_testing;
 
 use operations_structs::OpFlow as OpFlow;
 mod operations_structs;
-use code_provider_structs::{CodeProvider,ApiFunCall};
+use code_provider_structs::{CodeProvider, ApiFunCall, MaxConnections, FunGroup};
 mod code_provider_structs;
 
 // Controllo prima politica
@@ -46,4 +46,9 @@ fn test_api_first () {
 #[test]
 fn test_api_second () {
     quickcheck(isolation_test as fn(CodeProvider, ApiFunCall) -> bool);
+}
+
+#[test]
+fn test_api_third () {
+    quickcheck(connections_test as fn(MaxConnections, FunGroup) -> bool);
 }

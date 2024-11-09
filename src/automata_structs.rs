@@ -1,5 +1,4 @@
-use crate::code_provider_structs::CodeProvider as CodeProvider;
-use crate::code_provider_structs::ApiFunCall as ApiFunCall;
+use crate::code_provider_structs::{CodeProvider, ApiFunCall};
 
 
 // Struct representing outgoing edges from a state of the automata
