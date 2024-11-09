@@ -1,26 +1,6 @@
-use crate::automata_structs::Edge as Edge;
-use crate::automata_structs::State as State;
+use crate::automata_structs::{Edge, State, TestResult, EdgeId};
 
 use crate::operations_structs::OpFlow as OpFlow;
-
-// Struttura che contiene il risultato di un'istanza di test
-struct TestResult {
-    // Codice del risultato
-    result_code: u8,
-    // Numero di stati esplorati
-    explored_states: u8,
-    // Possibile prossimo stato
-    // usato se lo stato non viene trovato
-    next_state_unfound: Option<String>,
-    // Edge resi true dall'ultima operazione
-    // se più edge sono stati resi true
-    true_edges: Option<Vec<EdgeId>>,
-}
-
-struct EdgeId {
-    from_state: String,
-    to_state: String,
-}
 
 // Checks if the operation is "Read"
 fn op_is_read(op: String)-> bool {
@@ -216,7 +196,7 @@ fn print_result (result: TestResult, ops: OpFlow) -> bool {
         3 => {
             println!("Raggiunto stato di fallimento.\nLa sequenza di operazioni che ha fallito è:");
             let OpFlow(ref op_seq) = ops;
-            for i in (op_seq.len()-result.explored_states as usize..op_seq.len()).rev() {
+            for i in (op_seq.len()-(result.explored_states as usize)-1..op_seq.len()).rev() {
                 match op_seq[i as usize].as_str() {
                     "RD" => println!("Read"),
                     "WR" => println!("Write"),

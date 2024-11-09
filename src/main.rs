@@ -3,8 +3,8 @@ mod automata_structs;
 
 use file_testing::{open_first, read_only, single_write};
 mod file_testing;
-use API_testing::{conflict_test, isolation_test, connections_test};
-mod API_testing;
+use api_testing::{conflict_test, isolation_test, connections_test};
+mod api_testing;
 
 use operations_structs::OpFlow as OpFlow;
 mod operations_structs;

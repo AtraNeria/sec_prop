@@ -29,4 +29,22 @@ pub struct State {
 
 }
 
+// Struttura che contiene il risultato di un'istanza di test
+pub struct TestResult {
+    // Codice del risultato
+    pub result_code: u8,
+    // Numero di stati esplorati
+    pub explored_states: u8,
+    // Possibile prossimo stato
+    // usato se lo stato non viene trovato
+    pub next_state_unfound: Option<String>,
+    // Edge resi true dall'ultima operazione
+    // se più edge sono stati resi true
+    pub true_edges: Option<Vec<EdgeId>>,
+}
 
+// Struttura per identificare un arco
+pub struct EdgeId {
+    pub from_state: String,
+    pub to_state: String,
+}
