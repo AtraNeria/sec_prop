@@ -1,11 +1,11 @@
-use crate::automata_structs::{Edge, State, TestResult, EdgeId};
+use crate::automata_structs::{Edge, State, Result, EdgeId};
 use crate::code_provider_structs::{CodeProvider, ApiFunCall, FunGroup, MaxConnections, get_providers};
 
 // Struttura per contenere il risultato del test sulle connessioni
 struct ConnectionResult {
     result_code: u8,
     functions_called: u8,
-    finale_cons: u8,
+    final_cons: u8,
 }
 
 
@@ -29,9 +29,9 @@ fn is_false(res: String)-> bool {
 
 
 // Funzione per il testing su automa proprietà su API
-fn test_api_automata (automa: Vec<State>, chosen_provider: CodeProvider, called: ApiFunCall) -> TestResult {
+fn test_api_automata (automa: Vec<State>, chosen_provider: CodeProvider, called: ApiFunCall) -> Result {
     // Inizializzo risultato del test
-    let mut res = TestResult {
+    let mut res = Result {
         result_code: 0,
         explored_states: 0,
         next_state_unfound: None,
@@ -106,7 +106,7 @@ fn test_api_automata (automa: Vec<State>, chosen_provider: CodeProvider, called:
 }
 
 // Funzione per stampare i risultati dei test su conflitti e isolamento
-fn print_result (result: TestResult, chosen_provider: CodeProvider, called: ApiFunCall, fn_tested: u8) -> bool {
+fn print_result (result: Result, chosen_provider: CodeProvider, called: ApiFunCall, fn_tested: u8) -> bool {
     match result.result_code {
         0 => {
             println!("Stato finale: successo");
@@ -150,7 +150,7 @@ fn print_connections_result (result: ConnectionResult, con_max: MaxConnections, 
     match result.result_code {
         0 => {
             println!("Tutte le funzioni richieste sono state chiamate! Si sono usate {} su {} connessioni disponibili", 
-            result.finale_cons,
+            result.final_cons,
             mc);
             return true;
         },
@@ -160,7 +160,7 @@ fn print_connections_result (result: ConnectionResult, con_max: MaxConnections, 
             for i in (fg.len()-(result.functions_called as usize)-1.. fg.len()).rev() {
                 println!("{} con connessioni richieste {}",fg[i].name, fg[i].connections_required);
             }
-            println!("Per un totale di {} su {} connessioni disponibili",result.finale_cons, mc);
+            println!("Per un totale di {} su {} connessioni disponibili",result.final_cons, mc);
         },
         _ => println!("Errore non previsto"),
 
@@ -304,7 +304,7 @@ fn test_connections (max_con: MaxConnections, called: FunGroup, curr_con: u8, fu
                 let res = ConnectionResult {
                     result_code: 3,
                     functions_called: new_called,
-                    finale_cons: new_con,
+                    final_cons: new_con,
                 };
                 return res;
             }
@@ -315,7 +315,7 @@ fn test_connections (max_con: MaxConnections, called: FunGroup, curr_con: u8, fu
             let res = ConnectionResult {
                 result_code: 0,
                 functions_called: funs_called,
-                finale_cons: curr_con,
+                final_cons: curr_con,
             };
             return res;
         },
@@ -335,6 +335,6 @@ pub fn isolation_test (provider: CodeProvider, api_call: ApiFunCall) -> bool {
 }
 
 // Da passare a quickcheck per il test su connessioni
-pub fn connections_test (con_max: MaxConnections, api_calls: FunGroup) -> bool {
+pub fn connection_limit_test (con_max: MaxConnections, api_calls: FunGroup) -> bool {
     return print_connections_result(test_connections(con_max.clone(), api_calls.clone(), 0, 0), con_max, api_calls);
 }

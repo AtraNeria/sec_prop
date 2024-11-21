@@ -1,4 +1,4 @@
-use crate::automata_structs::{Edge, State, TestResult, EdgeId};
+use crate::automata_structs::{Edge, State, Result, EdgeId};
 
 use crate::operations_structs::OpFlow as OpFlow;
 
@@ -86,7 +86,7 @@ fn op_is_not_opencreate(op: String)-> bool {
 
 
 // Testo il flusso di operazioni ops sull'automa
-fn test_flow (ops: OpFlow, automa: Vec<State>) -> TestResult {
+fn test_flow (ops: OpFlow, automa: Vec<State>) -> Result {
     // Prelevo stato start
     let mut current_state = &automa[0];
     // Destruct OpFlow
@@ -95,7 +95,7 @@ fn test_flow (ops: OpFlow, automa: Vec<State>) -> TestResult {
     let mut curr_op = op_seq.pop();
 
     // Inizializzo risultato del test
-    let mut res = TestResult {
+    let mut res = Result {
         result_code: 0,
         explored_states: 0,
         next_state_unfound: None,
@@ -167,7 +167,7 @@ fn test_flow (ops: OpFlow, automa: Vec<State>) -> TestResult {
 }
 
 // Print warning in base all'output di test_flow
-fn print_result (result: TestResult, ops: OpFlow) -> bool {
+fn print_result (result: Result, ops: OpFlow) -> bool {
     match result.result_code {
         // Stato finale
         0 => {

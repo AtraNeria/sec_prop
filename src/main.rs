@@ -3,7 +3,7 @@ mod automata_structs;
 
 use file_testing::{open_first, read_only, single_write};
 mod file_testing;
-use api_testing::{conflict_test, isolation_test, connections_test};
+use api_testing::{conflict_test, isolation_test, connection_limit_test};
 mod api_testing;
 
 use operations_structs::OpFlow as OpFlow;
@@ -50,5 +50,5 @@ fn test_api_second () {
 
 #[test]
 fn test_api_third () {
-    quickcheck(connections_test as fn(MaxConnections, FunGroup) -> bool);
+    quickcheck(connection_limit_test as fn(MaxConnections, FunGroup) -> bool);
 }

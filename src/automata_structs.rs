@@ -30,7 +30,7 @@ pub struct State {
 }
 
 // Struttura che contiene il risultato di un'istanza di test
-pub struct TestResult {
+pub struct Result {
     // Codice del risultato
     pub result_code: u8,
     // Numero di stati esplorati
